@@ -3,6 +3,8 @@ dist/
 .vite/
 *.tsbuildinfo
 qa-*.png
+coverage/
+reports/
 .env
 .env.local
 .env.*.local

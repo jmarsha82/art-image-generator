@@ -82,6 +82,55 @@ npm.cmd run build
 
 The production build is written to `dist/`.
 
+## Unit Tests
+
+Unit tests are kept in one unified location:
+
+```text
+tests/unit/
+```
+
+Run the full unit test suite:
+
+```bash
+npm test
+```
+
+Run tests with coverage:
+
+```bash
+npm run test:coverage
+```
+
+The coverage gate is configured in `vite.config.ts` and requires at least 90% line coverage for the unit-scoped source modules. The current suite covers OpenAI image generation behavior, local IndexedDB persistence, and core App rendering/generation flows.
+
+## Linting
+
+Run ESLint locally:
+
+```bash
+npm run lint
+```
+
+Generate an ESLint SARIF report for GitHub code scanning:
+
+```bash
+npm run lint:sarif
+```
+
+The SARIF file is written to `reports/eslint.sarif`; `reports/` is ignored by Git.
+
+## CI Pipeline
+
+The GitHub Actions workflow lives at `.github/workflows/ci.yml` and runs on pull requests, pushes to `main`, and manual dispatch.
+
+- `Unit Tests and Build`: installs with `npm ci`, runs ESLint, runs `npm run test:coverage`, builds the app, and uploads `coverage/lcov.info` as an artifact.
+- `Code Scanning / Quality`: runs ESLint with SARIF output and uploads the results to GitHub code scanning.
+- `Code Scanning / Security`: runs CodeQL for JavaScript/TypeScript with the `security-and-quality` query suite.
+- `Dependency Security`: runs GitHub Dependency Review on pull requests and `npm audit --omit=dev --audit-level=moderate`.
+
+GitHub code scanning and Dependency Review are free for public repositories on GitHub.com. For private or internal repositories, GitHub documents these features as requiring GitHub Code Security or Advanced Security to be enabled.
+
 ## Preview Production Build
 
 ```bash
@@ -96,7 +145,6 @@ npm.cmd run preview
 
 ## Notes
 
-- There are no unit tests in this project by request.
 - The app does not include image download controls.
 - The app calls `POST https://api.openai.com/v1/images/edits` with `gpt-image-2`.
 - Web scraping arbitrary images from the browser is intentionally avoided because CORS, site policies, robots rules, and copyright constraints make direct scraping unreliable and risky in a no-backend app.
